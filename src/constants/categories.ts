@@ -1,0 +1,10 @@
+export const PRODUCT_CATEGORIES = [
+  "SCRIPTS",
+  "PLUGINS",
+  "UI KITS",
+  "THEMES",
+  "MOBILE APPS",
+  "GRAPHICS"
+];
+
+export const ALL_CATEGORIES = ["ALL", ...PRODUCT_CATEGORIES];
