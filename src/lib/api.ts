@@ -22,13 +22,17 @@ export interface UserWithToken extends User {
   token?: string;
 }
 
+// 1. Definisikan tipe untuk Header yang konsisten
+type Headers = Record<string, string>;
+
 const fetchFromBackend = async (endpoint: string, options: RequestInit = {}) => {
   const cleanBaseUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
-  const url = `${cleanBaseUrl}/v1${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+  const url = `${cleanBaseUrl}/api/v1${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
   
-  const headers = {
+  // Menggabungkan headers dengan aman
+  const headers: Headers = {
     'Content-Type': 'application/json',
-    ...options.headers,
+    ...(options.headers as Headers),
   };
   
   console.log(`[API Request]: ${options.method || 'GET'} ${url}`);
@@ -53,7 +57,8 @@ const getAuthToken = (): string | null => {
   }
 };
 
-const authHeader = () => {
+// 2. Pastikan fungsi ini selalu return Record<string, string>
+const authHeader = (): Headers => {
   const token = getAuthToken();
   return token ? { 'Authorization': `Bearer ${token}` } : {};
 };

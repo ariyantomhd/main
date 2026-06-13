@@ -28,8 +28,8 @@ const ITEMS_PER_PAGE = 20;
 
 // --- Skeleton Component ---
 const SkeletonCard = () => (
-  <div className="bg-app-surface rounded-none overflow-hidden border border-app-border animate-pulse h-[450px]">
-    <div className="aspect-[16/9] bg-app-border" />
+  <div className="bg-app-surface rounded-none overflow-hidden border border-app-border animate-pulse h-112.5">
+    <div className="aspect-video bg-app-border" />
     <div className="p-5 space-y-4">
       <div className="flex justify-between">
         <div className="h-3 w-20 bg-app-border rounded" />
