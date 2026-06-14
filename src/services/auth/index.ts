@@ -1,10 +1,8 @@
 'use client';
 
-// SOLUSI: Mengubah path alias '@/' menjadi jalur relatif agar langsung terbaca oleh compiler
 import { api } from '../../lib/api';
-import type { UserWithToken } from '../../lib/api';
-
-// SOLUSI ESLINT: Menghapus import 'User' yang tidak terpakai agar tidak memicu error linter
+// Perbaikan: Import dari path yang benar sesuai struktur proyek Abang
+import type { UserWithToken } from '../../types/marketplace'; 
 
 interface ApiResponse<T> {
   success: boolean;
@@ -14,7 +12,6 @@ interface ApiResponse<T> {
 
 /**
  * Helper internal untuk melakukan flattening/pembersihan data user dari API Backend.
- * Mengadopsi logika penataan desimal dan nilai default agar UI tidak crash.
  */
 const transformAndFlattenUser = (rawUser: UserWithToken | null | undefined): UserWithToken | null => {
   if (!rawUser) return null;
@@ -30,54 +27,51 @@ const transformAndFlattenUser = (rawUser: UserWithToken | null | undefined): Use
     avatar_url: anyUser.avatar_url || null,
     role: anyUser.role || 'user',
     
-    // Memastikan nilai saldo dikonversi ke number float javascript secara aman
+    // Konversi nilai saldo ke float yang aman
     balance: typeof anyUser.balance === 'string' ? parseFloat(anyUser.balance) : (anyUser.balance || 0),
     affiliate_balance: typeof anyUser.affiliate_balance === 'string' ? parseFloat(anyUser.affiliate_balance) : (anyUser.affiliate_balance || 0),
     total_withdrawn: typeof anyUser.total_withdrawn === 'string' ? parseFloat(anyUser.total_withdrawn) : (anyUser.total_withdrawn || 0),
     
     createdAt: anyUser.createdAt || new Date().toISOString(),
     updatedAt: anyUser.updatedAt || new Date().toISOString(),
-    token: rawUser.token // Pertahankan token JWT jika ada
+    token: rawUser.token
   } as UserWithToken;
 };
 
 export const authService = {
-  // 1. Mendaftarkan user baru via API
   async registerUser(payload: Record<string, string>) {
     return await api.auth.register(payload);
   },
 
-  // 2. Login user, bersihkan datanya, lalu amankan ke localStorage
   async loginUser(payload: Record<string, string>): Promise<ApiResponse<UserWithToken | null>> {
     const result = await api.auth.login(payload);
     
     if (result.success && result.data) {
-      // Jalankan proses transformasi agar data balance aman menjadi number float
-      const cleanUser = transformAndFlattenUser(result.data);
+      const cleanUser = transformAndFlattenUser(result.data as UserWithToken);
       
       if (cleanUser && cleanUser.token) {
         localStorage.setItem('demo_user', JSON.stringify(cleanUser));
-        result.data = cleanUser; // Kembalikan data yang sudah bersih ke store/UI
+        result.data = cleanUser;
       }
     }
     
     return result;
   },
 
-  // 3. Mengambil session user aktif saat reload halaman, lalu bersihkan datanya
   async loadCurrentUser(): Promise<ApiResponse<UserWithToken | null>> {
     const result = await api.auth.getCurrentUser();
     
     if (result.success && result.data) {
-      const cleanUser = transformAndFlattenUser(result.data);
+      const cleanUser = transformAndFlattenUser(result.data as UserWithToken);
       result.data = cleanUser;
     }
     
     return result;
   },
 
-  // 4. Logout dan bersihkan berkas sesi
   async logoutUser() {
+    // Pastikan hapus dari storage saat logout
+    localStorage.removeItem('demo_user');
     return await api.auth.logout();
   }
 };

@@ -10,8 +10,9 @@ export default function ItemCard({ item }: { item: Product; key?: string }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const addItem = useCartStore(state => state.addItem);
 
+  // 🌟 Navigasi menggunakan slug untuk SEO friendly (dengan fallback ke id)
   const handleCardClick = () => {
-    navigate(`/products/${item.id}`);
+    navigate(`/products/${item.slug || item.id}`);
   };
 
   const toggleWishlist = (e: React.MouseEvent) => {
@@ -21,10 +22,10 @@ export default function ItemCard({ item }: { item: Product; key?: string }) {
 
   const handleDemoClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if(item.demoUrl) {
+    if (item.demoUrl) {
       window.open(item.demoUrl, '_blank');
     } else {
-      handleCardClick(); // Fallback to details if no demo URL
+      handleCardClick();
     }
   };
 
@@ -59,7 +60,6 @@ export default function ItemCard({ item }: { item: Product; key?: string }) {
           referrerPolicy="no-referrer"
         />
         
-        {/* Wishlist Button */}
         <button 
           onClick={toggleWishlist}
           className="absolute top-3 right-3 w-8 h-8 bg-app-surface/80 backdrop-blur-sm border border-app-border rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-sm group/btn group-hover:bg-app-surface"
@@ -70,8 +70,6 @@ export default function ItemCard({ item }: { item: Product; key?: string }) {
           />
         </button>
 
-        {/* Featured Badge */}
-        {/* Will show if item.isFeatured OR force it to display to match screenshot structure if preferred */}
         <div className="absolute bottom-0 right-0 bg-app-brand-green text-app-bg px-3 py-1.5 text-[9px] font-black uppercase tracking-wider flex items-center gap-1 rounded-tl-xl">
           <Bookmark size={10} className="fill-app-bg" />
           FEATURED
@@ -80,7 +78,6 @@ export default function ItemCard({ item }: { item: Product; key?: string }) {
 
       {/* Content */}
       <div className="p-4 flex-1 flex flex-col relative bg-gradient-to-b from-app-surface to-app-bg/50">
-        {/* Row 1: Tags & Version */}
         <div className="flex justify-between items-center mb-2">
           <div className="flex gap-2 text-app-accent text-[9px] font-black uppercase tracking-wider">
             {item.tags && item.tags.length > 0 ? (
@@ -88,7 +85,6 @@ export default function ItemCard({ item }: { item: Product; key?: string }) {
                 <span key={tag} className="bg-app-accent/10 px-1.5 py-0.5 rounded-sm">#{tag}</span>
               ))
             ) : (
-              // Fallbacks exactly like screenshot if tags aren't provided
               <>
                 <span className="bg-app-accent/10 px-1.5 py-0.5 rounded-sm">#VITE</span>
                 <span className="bg-app-accent/10 px-1.5 py-0.5 rounded-sm">#REACT</span>
@@ -101,12 +97,10 @@ export default function ItemCard({ item }: { item: Product; key?: string }) {
           </div>
         </div>
 
-        {/* Row 2: Title */}
-        <h3 className="font-bold text-app-primary text-base leading-snug mb-2 line-clamp-2 selection:bg-app-accent/20 group-hover:text-app-accent transition-colors">
+        <h3 className="font-bold text-app-primary text-base leading-snug mb-2 line-clamp-2 group-hover:text-app-accent transition-colors">
           {item.name}
         </h3>
 
-        {/* Row 3: Category, Sales & Stars */}
         <div className="flex items-center justify-between mb-3 mt-auto">
           <div className="flex items-center gap-3">
             <span className="bg-app-bg text-app-secondary px-2 py-1 text-[9px] font-bold uppercase tracking-widest rounded-sm border border-app-border">
@@ -118,14 +112,12 @@ export default function ItemCard({ item }: { item: Product; key?: string }) {
             </div>
           </div>
           <div className="flex items-center gap-[2px]">
-            {/* Hardcoded to 5 stars to match purely visual layout requested */}
             {[1, 2, 3, 4, 5].map((s) => (
               <Star key={s} size={11} className="fill-app-brand-gold text-app-brand-gold" />
             ))}
           </div>
         </div>
 
-        {/* Row 4: Price & Platform */}
         <div className="flex justify-between items-end mb-4 border-t border-app-border/50 pt-3">
           <div className="text-xl font-black text-app-primary">
             ${(item.discountPrice || item.price || 0).toLocaleString()}
@@ -136,7 +128,6 @@ export default function ItemCard({ item }: { item: Product; key?: string }) {
           </div>
         </div>
 
-        {/* Row 5: Action Buttons */}
         <div className="flex gap-2">
           <button 
             onClick={handleDemoClick}

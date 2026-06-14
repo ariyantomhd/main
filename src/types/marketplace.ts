@@ -1,3 +1,15 @@
+// 1. Tambahkan import User (pastikan path-nya benar)
+import { User } from './index'; 
+
+// 2. Tambahkan interface UserWithToken di sini
+export interface UserWithToken extends User {
+  token?: string;
+  balance?: number;
+  affiliate_balance?: number;
+  total_withdrawn?: number;
+}
+
+// 3. Masukkan semua interface admin yang sudah Abang miliki
 export interface AdminBlogPost {
   id: string;
   title: string;
@@ -62,4 +74,11 @@ export interface AdminUserRegistry {
 export interface AdminCoreConfig {
   siteName: string;
   maintenanceMode: boolean;
+}
+
+// Tambahkan ini di akhir file src/types/marketplace.ts
+export interface UserWithToken extends User {
+  token?: string;
+  balance?: number;
+  affiliate_status?: 'none' | 'pending' | 'active' | 'rejected';
 }
