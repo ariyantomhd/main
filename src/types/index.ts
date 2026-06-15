@@ -58,6 +58,7 @@ export interface Product {
   discount_Price?: number;
   discountPrice?: number; // Compatibility field
   reviews?: Review[];
+  badge?: 'NEW' | 'FEATURED' | 'HOT DEALS' | 'TRENDING' | string;
   createdAt: string;
   updatedAt: string;
 }

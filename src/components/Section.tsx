@@ -1,7 +1,7 @@
 import React from "react";
 import { ChevronRight } from "lucide-react";
 import ItemCard from "./ItemCard";
-import { Product } from "../types/product";
+import { Product } from "../types/index";
 
 interface SectionProps {
   title: string;
@@ -9,14 +9,17 @@ interface SectionProps {
   items: Product[];
   viewAllLink?: string;
   extraHeader?: React.ReactNode;
+  // Tambahkan prop ini untuk memaksa badge
+  badgeType?: "SALE" | "FEATURED" | "TRENDING" | "NEW"; 
 }
 
-export default function Section({ title, icon, items, viewAllLink, extraHeader }: SectionProps) {
+export default function Section({ title, icon, items, viewAllLink, extraHeader, badgeType }: SectionProps) {
   const getTitleColor = (text: string) => {
     const lower = text.toLowerCase();
     if (lower.includes('featured')) return 'text-app-accent';
+    if (lower.includes('new')) return 'text-app-brand-green';
     if (lower.includes('popular') || lower.includes('trending')) return 'text-app-brand-gold';
-    if (lower.includes('flash') || lower.includes('sale') || lower.includes('deals')) return 'text-app-brand-gold'; // or warning
+    if (lower.includes('flash') || lower.includes('sale') || lower.includes('deals')) return 'text-app-brand-red';
     return 'text-app-primary';
   };
 
@@ -45,9 +48,16 @@ export default function Section({ title, icon, items, viewAllLink, extraHeader }
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {Array.isArray(items) ? items.map((item) => (
-          <ItemCard key={item.id} item={item} />
-        )) : null}
+        {Array.isArray(items) 
+          ? items.slice(0, 8).map((item) => (
+              <ItemCard 
+                key={item.id} 
+                item={item}
+                forcedBadge={badgeType} // Meneruskan paksaan badge ke ItemCard
+              />
+            )) 
+          : null
+        }
       </div>
     </section>
   );

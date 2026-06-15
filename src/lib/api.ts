@@ -81,6 +81,14 @@ export const api = {
       const result = await response.json();
       return result.data || result || [];
     },
+    
+    // Fungsi Baru: Get New Releases
+    getNewReleases: async () => {
+      const response = await fetchFromBackend('/products/new-releases');
+      const result = await response.json();
+      return result.data || [];
+    },
+
     getProductBySlug: async (slug: string) => {
       const response = await fetchFromBackend(`/products/${slug}`);
       const result = await response.json();

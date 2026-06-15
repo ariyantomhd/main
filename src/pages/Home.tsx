@@ -4,7 +4,7 @@ import TechStackTicker from "../components/TechStackTicker";
 import Section from "../components/Section";
 import Footer from "../components/Footer";
 import CountdownTimer from "../components/CountdownTimer";
-import { Star, TrendingUp, Zap, RotateCcw } from "lucide-react";
+import { Star, TrendingUp, Zap, RotateCcw, Sparkles } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Product } from "../types/product";
 import { productsService } from "../services/products";
@@ -13,21 +13,25 @@ export default function Home() {
   const [featuredItems, setFeaturedItems] = useState<Product[]>([]);
   const [popularItems, setPopularItems] = useState<Product[]>([]);
   const [flashSaleItems, setFlashSaleItems] = useState<Product[]>([]);
+  const [newItems, setNewItems] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchHomeData = async () => {
       setIsLoading(true);
       try {
-        const [featured, popular, flashSale] = await Promise.all([
+        // Menggunakan getNewReleases() sesuai dengan definisi service Anda
+        const [featured, popular, flashSale, newArrivals] = await Promise.all([
           productsService.getFeaturedProducts(),
           productsService.getPopularProducts(),
           productsService.getFlashSaleProducts(),
+          productsService.getNewReleases(), 
         ]);
         
         setFeaturedItems(featured);
         setPopularItems(popular);
         setFlashSaleItems(flashSale);
+        setNewItems(newArrivals);
       } catch (error) {
         console.warn("Error fetching home data:", error);
       } finally {
@@ -53,29 +57,44 @@ export default function Home() {
           </div>
         ) : (
           <>
+            {/* New Releases Section */}
+            <Section 
+              title="New Releases" 
+              icon={<Sparkles size={20} />} 
+              items={newItems} 
+              badgeType="NEW"
+              viewAllLink="/products"
+            />
+
+            {/* Featured Section */}
             <Section 
               title="Featured Best Sellers" 
               icon={<Star size={20} />} 
               items={featuredItems} 
+              badgeType="FEATURED"
               viewAllLink="/products"
             />
 
+            {/* Flash Sale Section */}
             <Section 
               title="Weekly Flash Deals" 
               icon={<Zap size={20} />} 
               items={flashSaleItems} 
+              badgeType="SALE"
               viewAllLink="/products"
               extraHeader={<CountdownTimer />}
             />
             
+            {/* Trending Section */}
             <Section 
               title="Trending Now" 
               icon={<TrendingUp size={20} />} 
               items={popularItems} 
+              badgeType="TRENDING"
               viewAllLink="/products"
             />
             
-            {/* Why Choose Us Section - CodeCanyon Style */}
+            {/* Why Choose Us Section */}
             <div className="mt-24 mb-16 px-4 py-16 bg-app-surface rounded-2xl border border-app-border text-center">
               <h2 className="text-3xl font-black text-app-primary mb-12">Why Choose TheMavia Marketplace?</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
