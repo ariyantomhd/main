@@ -1,4 +1,3 @@
-// src/app/products/[slug]/page.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -74,7 +73,7 @@ export default function ProductDetailPage() {
   return (
     <div className="min-h-screen bg-white text-slate-800 font-sans selection:bg-orange-500 selection:text-white">
       
-      {/* Main Container dengan padding vertikal yang lebih ringkas */}
+      {/* Main Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 bg-slate-50/50 space-y-6">
         
         <Link
@@ -85,7 +84,7 @@ export default function ProductDetailPage() {
           <span>Back to Browse Catalog</span>
         </Link>
 
-        {/* Product Header Component (Tanpa atribut vendorName) */}
+        {/* Product Header Component */}
         <ProductHeader
           categoryName={categoryName}
           framework={framework}
@@ -102,7 +101,7 @@ export default function ProductDetailPage() {
           {/* Left Column */}
           <div className="lg:col-span-7 space-y-6">
             <ProductGallery
-              thumbnails={thumbnails}
+              images={thumbnails}
               selectedIndex={selectedScreenshotIndex}
               onSelectIndex={setSelectedScreenshotIndex}
               title={title}
@@ -123,14 +122,16 @@ export default function ProductDetailPage() {
               regularPrice={regularPrice}
               extendedPrice={extendedPrice}
               selectedLicense={selectedLicense}
-              onSelectLicense={setSelectedLicense} productId={''}            />
+              onSelectLicense={setSelectedLicense} 
+              productId={product.id || slug}
+            />
 
             <AffiliateBox slug={slug} />
           </div>
 
         </div>
 
-        {/* Related Products Section (Jarak atas dirapatkan menggunakan pt-2 alih-alih margin besar) */}
+        {/* Related Products Section */}
         <div className="pt-2">
           <RelatedProducts />
         </div>
