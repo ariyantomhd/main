@@ -70,14 +70,6 @@ export default function ProductDetailPage() {
   const reviewsCount = product.reviews?.length || 72;
   const salesCount = product.sales || 420;
 
-  // Props untuk ProductGallery dengan type assertion fleksibel agar bebas error TS2322
-  const galleryProps = {
-    images: thumbnails,
-    selectedIndex: selectedScreenshotIndex,
-    onSelectIndex: setSelectedScreenshotIndex,
-    title: title,
-  } as React.ComponentProps<typeof ProductGallery>;
-
   return (
     <div className="min-h-screen bg-white text-slate-800 font-sans selection:bg-orange-500 selection:text-white">
       
@@ -108,7 +100,13 @@ export default function ProductDetailPage() {
           
           {/* Left Column */}
           <div className="lg:col-span-7 space-y-6">
-            <ProductGallery {...galleryProps} />
+            <ProductGallery
+              thumbnails={thumbnails}
+              selectedIndex={selectedScreenshotIndex}
+              onSelectIndex={setSelectedScreenshotIndex}
+              title={title}
+              demoUrl={livePreviewUrl}
+            />
 
             <ProductTabs
               longDesc={longDesc}

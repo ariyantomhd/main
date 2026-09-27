@@ -16,7 +16,7 @@ export default function CartItemList() {
     );
   }
 
-  // Helper untuk mengambil nama pengguna (casting via unknown untuk menghindari TS2352)
+  // Helper untuk mengambil nama pengguna
   const getUserDisplayName = () => {
     if (!currentUser) return 'Guest';
     const userWithMeta = currentUser as unknown as Record<string, unknown>;
@@ -46,10 +46,8 @@ export default function CartItemList() {
       {/* List Item Keranjang */}
       <div className="divide-y divide-slate-100 bg-white rounded-lg border border-slate-200 overflow-hidden">
         {cart.map((item, index) => {
-          // Double assertion (as unknown as Record<...>) untuk bypass TS2352
           const prod = item.product as unknown as Record<string, unknown>;
           
-          // Fallback membaca gambar dari screenshotUrls, gallery, atau thumbnail_url
           const screenshotArray = Array.isArray(prod.screenshotUrls) ? (prod.screenshotUrls as string[]) : [];
           const galleryArray = Array.isArray(prod.gallery) ? (prod.gallery as Array<{ image_url: string }>) : [];
           
@@ -88,7 +86,6 @@ export default function CartItemList() {
 
               {/* Tipe Lisensi, Harga & Opsi Hapus */}
               <div className="flex items-center justify-between w-full sm:w-auto gap-4">
-                {/* Selector Lisensi */}
                 <select
                   value={item.licenseType}
                   onChange={(e) =>
@@ -104,14 +101,12 @@ export default function CartItemList() {
                   <option value="extended">Extended License</option>
                 </select>
 
-                {/* Harga */}
                 <div className="text-right min-w-[70px]">
                   <span className="text-sm font-bold text-slate-900 font-mono">
                     ${item.price.toFixed(2)}
                   </span>
                 </div>
 
-                {/* Tombol Hapus */}
                 <button
                   onClick={() => removeFromCart(productId, item.licenseType)}
                   className="text-slate-400 hover:text-red-500 transition-colors p-1"

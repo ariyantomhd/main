@@ -1,47 +1,77 @@
+'use client';
+
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronLeft, ChevronRight, X, Monitor, Camera, Heart } from "lucide-react";
 
-interface GalleryProps {
+export interface GalleryProps {
   thumbnails?: string[];
   images?: string[];
+  selectedIndex?: number;
+  onSelectIndex?: (index: number | ((prev: number) => number)) => void;
   activeIndex?: number;
   setActiveIndex?: React.Dispatch<React.SetStateAction<number>>;
+  title?: string;
   demoUrl?: string;
   likes?: number;
 }
 
 export default function Gallery({ 
-  images = [], 
+  thumbnails,
+  images, 
+  selectedIndex,
+  onSelectIndex,
   activeIndex: externalIndex, 
   setActiveIndex: externalSetActiveIndex, 
+  title = "Product Image",
   demoUrl, 
   likes = 0 
 }: GalleryProps) {
-  // State lokal jika parent component tidak mengirimkan activeIndex / setActiveIndex
+  // Resolusi daftar gambar dari prop images atau thumbnails
+  const imageList = images && images.length > 0 ? images : (thumbnails || []);
+
+  // State lokal jika parent component tidak mengirimkan controlling state
   const [internalIndex, setInternalIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(false);
   const [imgError, setImgError] = useState(false);
 
-  const activeIndex = externalIndex ?? internalIndex;
-  const setActiveIndex = externalSetActiveIndex || setInternalIndex;
+  // Menggabungkan props kontrol index yang dikirim dari parent
+  const activeIndex = selectedIndex ?? externalIndex ?? internalIndex;
+  
+  const handleIndexChange = (action: number | ((prev: number) => number)) => {
+    if (onSelectIndex) {
+      onSelectIndex(action);
+    } else if (externalSetActiveIndex) {
+      if (typeof action === 'function') {
+        externalSetActiveIndex(action);
+      } else {
+        externalSetActiveIndex(action);
+      }
+    } else {
+      if (typeof action === 'function') {
+        setInternalIndex(action);
+      } else {
+        setInternalIndex(action);
+      }
+    }
+  };
 
   // Gambar cadangan jika daftar gambar kosong atau URL bermasalah
   const fallbackImage = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop";
 
-  const validImages = images.filter((img) => Boolean(img));
+  const validImages = imageList.filter((img) => Boolean(img));
   const currentImageList = validImages.length > 0 ? validImages : [fallbackImage];
 
   const activeImage = imgError ? fallbackImage : (currentImageList[activeIndex] || currentImageList[0]);
 
   const next = () => {
     setImgError(false);
-    setActiveIndex((prev) => (prev + 1) % currentImageList.length);
+    handleIndexChange((prev) => (prev + 1) % currentImageList.length);
   };
 
   const prev = () => {
     setImgError(false);
-    setActiveIndex((prev) => (prev - 1 + currentImageList.length) % currentImageList.length);
+    handleIndexChange((prev) => (prev - 1 + currentImageList.length) % currentImageList.length);
   };
 
   return (
@@ -53,7 +83,7 @@ export default function Gallery({
             <motion.img
               key={activeIndex + activeImage}
               src={activeImage}
-              alt="Product Preview"
+              alt={title}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -64,7 +94,7 @@ export default function Gallery({
             />
           </AnimatePresence>
 
-          {/* Navigasi Panah Slide Utama (Selalu Tampil Permanen) */}
+          {/* Navigasi Panah Slide Utama */}
           <div className="absolute inset-0 flex items-center justify-between p-4 pointer-events-none z-10">
             <button
               type="button"
@@ -119,7 +149,6 @@ export default function Gallery({
       {/* Fullscreen Zoom Modal */}
       {isZoomed && (
         <div className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4">
-          {/* Close Button */}
           <button
             type="button"
             onClick={() => setIsZoomed(false)}
@@ -128,7 +157,6 @@ export default function Gallery({
             <X size={28} />
           </button>
 
-          {/* Navigasi Panah Fullscreen Modal */}
           <div className="absolute inset-0 flex items-center justify-between px-4 md:px-8 pointer-events-none z-50">
             <button
               type="button"
@@ -149,16 +177,14 @@ export default function Gallery({
             </button>
           </div>
 
-          {/* Image Counter */}
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/70 text-xs font-mono font-bold tracking-widest uppercase bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full z-50">
             {activeIndex + 1} / {currentImageList.length}
           </div>
 
-          {/* Main Zoomed Image */}
           <motion.img
             key={activeIndex + activeImage}
             src={activeImage}
-            alt="Zoomed Preview"
+            alt={title}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.2 }}
