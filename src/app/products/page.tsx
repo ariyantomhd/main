@@ -1,7 +1,7 @@
 // src/app/products/page.tsx
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, Suspense } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { productApi } from '@/services/productApi';
@@ -14,11 +14,11 @@ import CategoryDropdown from '@/components/CategoryDropdown';
 import FilterDropdown from '@/components/FilterDropdown';
 import PaginationButtons from '@/components/PaginationButtons';
 
-export default function ProductsPage() {
+function ProductsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Ambil parameter dari URL (termasuk sort dan filter baru dari Navbar)
+  // Ambil parameter dari URL
   const categoryParam = searchParams.get('category') || 'ALL';
   const techParam = searchParams.get('tech') || 'ALL';
   const tagParam = searchParams.get('tag') || undefined;
@@ -84,7 +84,7 @@ export default function ProductsPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Filter gabungan & Sorting di sisi client (Tanpa tipe 'any')
+  // Filter gabungan & Sorting di sisi client
   const filteredProducts = useMemo(() => {
     if (!products) return [];
 
@@ -112,7 +112,7 @@ export default function ProductsPage() {
       return matchesSearch && matchesTech && matchesFilter;
     });
 
-    // Logika Sorting (?sort=trending / ?sort=bestseller) dengan konversi tipe yang aman dari error TS2362/TS2363
+    // Logika Sorting (?sort=trending / ?sort=bestseller)
     if (sortParam === 'trending') {
       result.sort((a: Product, b: Product) => {
         const idA = typeof a.id === 'number' ? a.id : Number(a.id) || 0;
@@ -150,9 +150,9 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      {/* Toolbar: Search & Filters (Category & Tech Dropdown) dengan Gradient Deep Purple ke Hijau Tosca */}
-      <div className="bg-gradient-to-r from-purple-950 via-indigo-800 to-teal-500 p-4 rounded-2xl shadow-xl mb-8 ">
-        <div className=" backdrop-blur-md p-4 rounded-2xl flex flex-col md:flex-row items-center gap-4">
+      {/* Toolbar: Search & Filters */}
+      <div className="bg-gradient-to-r from-purple-950 via-indigo-800 to-teal-500 p-4 rounded-2xl shadow-xl mb-8">
+        <div className="backdrop-blur-md p-4 rounded-2xl flex flex-col md:flex-row items-center gap-4">
           <div className="w-full md:flex-1">
             <SearchForm 
               searchQuery={searchQuery} 
@@ -206,5 +206,23 @@ export default function ProductsPage() {
         </>
       )}
     </div>
+  );
+}
+
+export default function ProductsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="bg-slate-100 dark:bg-slate-800 h-80 rounded-3xl animate-pulse" />
+            ))}
+          </div>
+        </div>
+      }
+    >
+      <ProductsContent />
+    </Suspense>
   );
 }

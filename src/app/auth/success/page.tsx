@@ -1,13 +1,13 @@
 // src/app/auth/success/page.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { useUser } from '@/providers/UserContext';
 import { authApi } from '@/services/authApi';
 
-export default function AuthSuccessPage() {
+function AuthSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useUser();
@@ -33,7 +33,7 @@ export default function AuthSuccessPage() {
         let role = 'BUYER';
 
         try {
-          // 2. Ambil data profil user via authApi.me() (yang otomatis mengarah ke /getme atau /me di backend)
+          // 2. Ambil data profil user via authApi.me()
           const response = await authApi.me();
           const resRecord = response as unknown as Record<string, unknown>;
           const resData = (resRecord?.data as Record<string, unknown>) || resRecord;
@@ -50,7 +50,7 @@ export default function AuthSuccessPage() {
           role = (userData?.role as string) || 'BUYER';
         } catch (meError) {
           console.warn('Gagal memanggil authApi.me(), menggunakan data sesi langsung:', meError);
-          // Fallback aman jika endpoint profil belum merespons:
+          // Fallback aman jika endpoint profil belum merespons
           userId = 'verified-user-' + Date.now();
           email = 'user@tmv-hub.com';
           username = 'User';
@@ -98,8 +98,9 @@ export default function AuthSuccessPage() {
           </div>
         </div>
         <button
+          type="button"
           onClick={() => router.push('/login')}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-indigo-600/20"
+          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-indigo-600/20 cursor-pointer"
         >
           Pergi ke Halaman Login
         </button>
@@ -117,5 +118,20 @@ export default function AuthSuccessPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function AuthSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-white gap-4">
+          <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+          <p className="text-slate-400 text-sm">Memuat...</p>
+        </div>
+      }
+    >
+      <AuthSuccessContent />
+    </Suspense>
   );
 }
