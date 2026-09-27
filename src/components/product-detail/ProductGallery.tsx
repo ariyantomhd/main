@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { ChevronLeft, ChevronRight, X, Monitor, Camera, Heart } from "lucide-react";
 
 interface GalleryProps {
+  thumbnails?: string[];
   images?: string[];
   activeIndex?: number;
   setActiveIndex?: React.Dispatch<React.SetStateAction<number>>;
