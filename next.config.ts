@@ -2,13 +2,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Izinkan akses host/IP lokal untuk development HMR (mencegah blocked cross-origin request)
+  // Izinkan akses host/IP lokal untuk development HMR
   allowedDevOrigins: ['192.168.56.1', 'localhost:3000'],
 
-  // 🟢 Proxy semua API request dari Next.js ke Express Backend
+  // Proxy semua API request dari Next.js ke Express Backend
   async rewrites() {
-    // Ambil URL backend dari .env atau fallback ke port Express lokal (5000)
-    const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000";
+    const backendUrl =
+      process.env.NEXT_PUBLIC_API_BASE_URL ||
+      (process.env.NODE_ENV === "production"
+        ? "https://api.themavia.com"
+        : "http://localhost:5000");
 
     return [
       {

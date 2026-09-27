@@ -1,8 +1,11 @@
 // src/services/apiConfig.ts
 
+// Menggunakan NEXT_PUBLIC_API_BASE_URL dengan fallback otomatis ke https://api.themavia.com untuk Production
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
-  "http://localhost:5000";
+  (process.env.NODE_ENV === "production"
+    ? "https://api.themavia.com"
+    : "http://localhost:5000");
 
 const API_URL = BASE_URL;
 
@@ -96,7 +99,6 @@ export async function fetchApi<T>(
 ): Promise<T> {
   const {
     params,
-    // Naikkan default timeout dari 15 detik menjadi 30 detik untuk mengakomodasi proses Auth/Email eksternal
     timeout = 30000,
     ...fetchOptions
   } = options;
