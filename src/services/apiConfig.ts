@@ -1,8 +1,9 @@
 // src/services/apiConfig.ts
 
-// Menggunakan NEXT_PUBLIC_API_BASE_URL dengan fallback otomatis ke https://api.themavia.com untuk Production
+// Mendukung berbagai varian nama environment variable secara aman untuk production maupun development
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
   (process.env.NODE_ENV === "production"
     ? "https://api.themavia.com"
     : "http://localhost:5000");
@@ -201,7 +202,7 @@ export async function fetchApi<T>(
 
     if (!response.ok) {
       let message =
-        `Request failed (${response.status})`;
+        `Request failed (${response.status})[cite: 10]`;
 
       if (
         isApiErrorResponse(
